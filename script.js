@@ -4,8 +4,6 @@ const WINNER_SOLUTION = 4;
 const gameBoard = document.getElementById('game-board');
 const gameArray = [];
 let currentPlayer = 1;
-let elementNumber = 0;
-let winner = 0;
 
 function createRows() {
     for (let i = 0; i < MAX_ROW; ++i) {
@@ -24,8 +22,6 @@ function createCol() {
             gameArray[row][col] = 0;
             const colElement = document.createElement('div');
             colElement.classList.add('col-3', 'circle');
-            colElement.id = 'cl-' + elementNumber;
-            ++elementNumber;
             currentRow.appendChild(colElement);
             colElement.onclick = () => {
                 playerTurn(colElement, row, col);
@@ -39,26 +35,23 @@ createCol();
 
 function playerTurn(div, row, col) {
     if (currentPlayer === 1 && checkColor(div)) {
-        div.style.backgroundColor ="rgb(255, 0, 0)";
-        gameArray[row][col] = 'R';
-        colorElement = gameArray[row][col];
-        currentPlayer = 2;
-        if (checkWinner(row, col) === true) {
+        changeColourForPlayer1(div, row, col);
+        console.log(currentPlayer);
+        if (checkWin('R')) {
             document.getElementById('player-move').innerHTML = 'Player 1 WON!'
+            createRestartButton();
         } else {
             playerTurnText(currentPlayer);
         }
-    } else if (currentPlayer === 2 && checkColor(div)) {
-        div.style.backgroundColor ="rgb(255, 255, 0)";
-        gameArray[row][col] = 'G';
-        currentPlayer = 1;
-        if (checkWinner(row, col)) {
+    } else if (currentPlayer === 2) {
+        changeColourForPlayer2(div, row, col);
+        if (checkWin('G')) {
             document.getElementById('player-move').innerHTML  = 'Player 2 WON!'
+            createRestartButton();
         } else {
             playerTurnText(currentPlayer);
         }
     }
-    console.log(gameArray);
 }
 
 function checkColor(div) {
@@ -70,109 +63,63 @@ function playerTurnText(currentPlayer) {
     playerText.innerHTML = 'Player move: Player ' + currentPlayer;
 }
 
-function checkWinner(row, col) {
-    let copyRow = row;
-    let copyCol = col;
-    for (let moves = WINNER_SOLUTION; moves >= 1; --moves) { //stanga
-        if (gameArray[copyRow][copyCol] != gameArray[row][col]) {
-            return false;
-        }
-        ++winner;
-        console.log(gameArray[copyRow][copyCol]);
-        console.log(gameArray[row][col]);
-        --copyCol;
-    }
-    console.log(winner);
-    if (isWinner(winner)) {
-        return true;
-    }
-    for (let moves = WINNER_SOLUTION; moves >= 1; --moves) { //dreapta
-        let copyRow = row;
-        let copyCol = col;
-        if (gameArray[copyRow][copyCol] === gameArray[row][col]) {
-            ++winner;
-        }
-        ++copyCol;
-    }
-    if (isWinner(winner)) {
-        return true;
-    }
-    for (let moves = WINNER_SOLUTION; moves >= 1; --moves) { //sus
-        let copyRow = row;
-        let copyCol = col;
-        if (gameArray[copyRow][copyCol] === gameArray[row][col]) {
-            ++winner;
-        }
-        --copyRow;
-    }
-    if (isWinner(winner)) {
-        return true;
-    }
-    for (let moves = WINNER_SOLUTION; moves => 1; --moves) { //jos
-        let copyRow = row;
-        let copyCol = col;
-        if (gameArray[copyRow][copyCol] === gameArray[row][col]) {
-            ++winner;
-        }
-        ++copyRow;
-    }
-    if (isWinner(winner)) {
-        return true;
-    }
-    for (let moves = WINNER_SOLUTION; moves >= 1; --moves) { //diagonala stanga sus
-        let copyRow = row;
-        let copyCol = col;
-        if (gameArray[copyRow][copyCol] === gameArray[row][col]) {
-            ++winner;
-        }
-        --copyRow;
-        --copyCol;
-    }
-    if (isWinner(winner)) {
-        return true;
-    }
-    for (let moves = WINNER_SOLUTION; moves >= 1; --moves) { //diagonala dreapta sus
-        let copyRow = row;
-        let copyCol = col;
-        if (gameArray[copyRow][copyCol] === gameArray[row][col]) {
-            ++winner;
-        }
-        ++copyCol;
-        --copyRow;
-    }
-    if (isWinner(winner)) {
-        return true;
-    }
-    for (let moves = WINNER_SOLUTION; moves >= 1; --moves) { //diagonala stanga jos
-        let copyRow = row;
-        let copyCol = col;
-        if (gameArray[copyRow][copyCol] === gameArray[row][col]) {
-            ++winner;
-        }
-        --copyCol;
-        ++copyRow;
-    }
-    if (isWinner(winner)) {
-        return true;
-    }
-    for (let moves = WINNER_SOLUTION; moves >= 1; --moves) { //diagonala dreapta jos
-        let copyRow = row;
-        let copyCol = col;
-        if (gameArray[copyRow][copyCol] === gameArray[row][col]) {
-            ++winner;
-        }
-        ++copyCol;
-        ++copyRow;
-    }
-    if (isWinner(winner)) {
-        return true;
+function checkWin(player) {
+    for (let row = 0; row < MAX_ROW; ++row) {
+        for (let col = 0; col < MAX_COL; ++col) {
+            if (gameArray[row][col] !== player) {
+                continue;
+            }
+            if (col + 3 < MAX_COL && 
+                gameArray[row][col] === gameArray[row][col + 1] && 
+                gameArray[row][col] === gameArray[row][col + 2] &&
+                gameArray[row][col] === gameArray[row][col + 3]) { // horizontal (left to right)
+                return true;
+            }
+            if (row + 3 < MAX_ROW &&
+                gameArray[row][col] === gameArray[row + 1][col] && 
+                gameArray[row][col] === gameArray[row + 2][col] &&
+                gameArray[row][col] === gameArray[row + 3][col]) { //vertical (top to bottom)
+                return true;
+            }
+            if (row + 3 < MAX_ROW && col + 3 < MAX_COL &&
+                gameArray[row][col] === gameArray[row + 1][col + 1] &&
+                gameArray[row][col] === gameArray[row + 2][col + 2] &&
+                gameArray[row][col] === gameArray[row + 3][col + 3]) { //diagonal (top left - bottom right)
+                return true;
+            }
+            if (row + 3 < MAX_ROW && col - 3 <= MAX_COL &&
+                gameArray[row][col] === gameArray[row + 1][col - 1] &&
+                gameArray[row][col] === gameArray[row + 2][col - 2] &&
+                gameArray[row][col] === gameArray[row + 3][col - 3]) { //diagonal (top right - bottom left)
+                return true;
+            }
+        }   
     }
     return false;
 }
 
-function isWinner(winnerEl) {
-    if (winnerEl === WINNER_SOLUTION) {
-        return true;
+function changeColourForPlayer2(player, row, col) {
+    player.style.backgroundColor ="rgb(255, 255, 0)";
+    gameArray[row][col] = 'G';
+    currentPlayer = 1;
+}
+
+function changeColourForPlayer1(player, row, col) {
+    player.style.backgroundColor ="rgb(255, 0, 0)";
+    gameArray[row][col] = 'R';
+    currentPlayer = 2;
+}
+
+function createRestartButton() {
+    const restartButton = document.createElement('button');
+    document.getElementById('restart-button').appendChild(restartButton);
+    restartButton.classList.add('btn', 'btn-success');
+    restartButton.textContent = 'Start a new game';
+    restartButton.onclick = () => {
+        startNewGame();
     }
-    winner = 0;
+}
+
+function startNewGame() {
+    location.reload()
 }
