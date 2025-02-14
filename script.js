@@ -4,6 +4,7 @@ const WINNER_SOLUTION = 4;
 const gameBoard = document.getElementById('game-board');
 const gameArray = [];
 let currentPlayer = 1;
+let winnerFound = 1;
 
 function createRows() {
     for (let i = 0; i < MAX_ROW; ++i) {
@@ -34,19 +35,21 @@ createRows();
 createCol();
 
 function playerTurn(div, row, col) {
-    if (currentPlayer === 1 && checkColor(div)) {
+    if (currentPlayer === 1 && checkColor(div) && winnerFound !== 0) {
         changeColourForPlayer1(div, row, col);
         console.log(currentPlayer);
         if (checkWin('R')) {
-            document.getElementById('player-move').innerHTML = 'Player 1 WON!'
+            document.getElementById('player-move').innerHTML = 'Player 1 WON!';
+            winnerFound = 0;
             createRestartButton();
         } else {
             playerTurnText(currentPlayer);
         }
-    } else if (currentPlayer === 2) {
+    } else if (currentPlayer === 2 && winnerFound !== 0) {
         changeColourForPlayer2(div, row, col);
         if (checkWin('G')) {
-            document.getElementById('player-move').innerHTML  = 'Player 2 WON!'
+            document.getElementById('player-move').innerHTML  = 'Player 2 WON!';
+            winnerFound = 0;
             createRestartButton();
         } else {
             playerTurnText(currentPlayer);
@@ -69,28 +72,16 @@ function checkWin(player) {
             if (gameArray[row][col] !== player) {
                 continue;
             }
-            if (col + 3 < MAX_COL && 
-                gameArray[row][col] === gameArray[row][col + 1] && 
-                gameArray[row][col] === gameArray[row][col + 2] &&
-                gameArray[row][col] === gameArray[row][col + 3]) { // horizontal (left to right)
+            if (col + 3 < MAX_COL && verifyWinner(row, col, 0, 1)) { //horizontal
                 return true;
             }
-            if (row + 3 < MAX_ROW &&
-                gameArray[row][col] === gameArray[row + 1][col] && 
-                gameArray[row][col] === gameArray[row + 2][col] &&
-                gameArray[row][col] === gameArray[row + 3][col]) { //vertical (top to bottom)
+            if (row + 3 < MAX_ROW && verifyWinner(row, col, 1, 0)) { //vertical
                 return true;
             }
-            if (row + 3 < MAX_ROW && col + 3 < MAX_COL &&
-                gameArray[row][col] === gameArray[row + 1][col + 1] &&
-                gameArray[row][col] === gameArray[row + 2][col + 2] &&
-                gameArray[row][col] === gameArray[row + 3][col + 3]) { //diagonal (top left - bottom right)
+            if (row + 3 < MAX_ROW && col + 3 < MAX_COL && verifyWinner(row, col, 1, 1)) { //diagonal (top left - bottom right)
                 return true;
             }
-            if (row + 3 < MAX_ROW && col - 3 <= MAX_COL &&
-                gameArray[row][col] === gameArray[row + 1][col - 1] &&
-                gameArray[row][col] === gameArray[row + 2][col - 2] &&
-                gameArray[row][col] === gameArray[row + 3][col - 3]) { //diagonal (top right - bottom left)
+            if (row + 3 < MAX_ROW && col - 3 <= MAX_COL && verifyWinner(row, col, 1, -1)) { //diagonal (top right - bottom left)
                 return true;
             }
         }   
@@ -118,6 +109,12 @@ function createRestartButton() {
     restartButton.onclick = () => {
         startNewGame();
     }
+}
+
+function verifyWinner(row, col, rowIndex, colIndex) {
+    return gameArray[row][col] === gameArray[row + (1 * rowIndex)][col + (1 * colIndex)] &&
+           gameArray[row][col] === gameArray[row + (2 * rowIndex)][col + (2 * colIndex)] &&
+           gameArray[row][col] === gameArray[row + (3 * rowIndex)][col + (3 * colIndex)];
 }
 
 function startNewGame() {
