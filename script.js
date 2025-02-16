@@ -72,16 +72,16 @@ function checkWin(player) {
             if (gameArray[row][col] !== player) {
                 continue;
             }
-            if (col + 3 < MAX_COL && verifyWinner(row, col, 0, 1)) { //horizontal
+            if (col + 3 < MAX_COL && verifyWinner(row, col, 0, 1)) { 
                 return true;
             }
-            if (row + 3 < MAX_ROW && verifyWinner(row, col, 1, 0)) { //vertical
+            if (row + 3 < MAX_ROW && verifyWinner(row, col, 1, 0)) { 
                 return true;
             }
-            if (row + 3 < MAX_ROW && col + 3 < MAX_COL && verifyWinner(row, col, 1, 1)) { //diagonal (top left - bottom right)
+            if (row + 3 < MAX_ROW && col + 3 < MAX_COL && verifyWinner(row, col, 1, 1)) { 
                 return true;
             }
-            if (row + 3 < MAX_ROW && col - 3 <= MAX_COL && verifyWinner(row, col, 1, -1)) { //diagonal (top right - bottom left)
+            if (row + 3 < MAX_ROW && col - 3 <= MAX_COL && verifyWinner(row, col, 1, -1)) { 
                 return true;
             }
         }   
