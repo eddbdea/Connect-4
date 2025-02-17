@@ -5,6 +5,7 @@ const gameBoard = document.getElementById('game-board');
 const gameArray = [];
 let currentPlayer = 1;
 let winnerFound = 1;
+let isTrue = false;
 
 function createRows() {
     for (let i = 0; i < MAX_ROW; ++i) {
@@ -37,7 +38,7 @@ createCol();
 function playerTurn(div, row, col) {
     if (currentPlayer === 1 && checkColor(div) && winnerFound !== 0) {
         changeColourForPlayer1(div, row, col);
-        console.log(currentPlayer);
+        console.log(checkWin('R'));
         if (checkWin('R')) {
             document.getElementById('player-move').innerHTML = 'Player 1 WON!';
             winnerFound = 0;
@@ -72,16 +73,12 @@ function checkWin(player) {
             if (gameArray[row][col] !== player) {
                 continue;
             }
-            if (col + 3 < MAX_COL && verifyWinner(row, col, 0, 1)) { 
-                return true;
-            }
-            if (row + 3 < MAX_ROW && verifyWinner(row, col, 1, 0)) { 
-                return true;
-            }
-            if (row + 3 < MAX_ROW && col + 3 < MAX_COL && verifyWinner(row, col, 1, 1)) { 
-                return true;
-            }
-            if (row + 3 < MAX_ROW && col - 3 <= MAX_COL && verifyWinner(row, col, 1, -1)) { 
+            verifyWinner(row, col, 0, 1);
+            verifyWinner(row, col, 1, 0);
+            verifyWinner(row, col, 1, 1);
+            verifyWinner(row, col, 1, -1);
+            if (isTrue === true) {
+                isTrue = false;
                 return true;
             }
         }   
@@ -112,9 +109,12 @@ function createRestartButton() {
 }
 
 function verifyWinner(row, col, rowIndex, colIndex) {
-    return gameArray[row][col] === gameArray[row + (1 * rowIndex)][col + (1 * colIndex)] &&
-           gameArray[row][col] === gameArray[row + (2 * rowIndex)][col + (2 * colIndex)] &&
-           gameArray[row][col] === gameArray[row + (3 * rowIndex)][col + (3 * colIndex)];
+    if (gameArray[row][col] === gameArray[row + (1 * rowIndex)][col + (1 * colIndex)] &&
+        gameArray[row][col] === gameArray[row + (2 * rowIndex)][col + (2 * colIndex)] &&
+        gameArray[row][col] === gameArray[row + (3 * rowIndex)][col + (3 * colIndex)]) {
+            isTrue = true;
+            return true;
+        }
 }
 
 function startNewGame() {
